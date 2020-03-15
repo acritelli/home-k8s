@@ -1,0 +1,3 @@
+- name: set wlan0 to promiscuous mode
+  command:
+    cmd: /sbin/ip link set wlan0 promisc on

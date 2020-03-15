@@ -1,0 +1,13 @@
+- name: install rclobe
+  copy:
+    dest: /usr/local/bin/rclone
+    src: usr/local/bin/rclone
+    mode: '0755'
+
+- name: create directory for config file
+  file:
+    path: /etc/rclone
+    owner: root
+    group: root
+    mode: '0640'
+    state: directory

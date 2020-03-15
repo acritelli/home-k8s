@@ -1,0 +1,103 @@
+- name: Create file for loop device
+  command:
+    cmd: /bin/dd if=/dev/zero of=/gluster_mount.img bs=100M count=50
+    creates: /gluster_mount.img
+
+# Format the /gluster_mount.img by mounting to /dev/loop0. This is only
+# done if it's necessary, so first register some variables to determine.
+- name: Check if a block device exists on /gluster_mount.img
+  command:
+    cmd: /sbin/blkid /gluster_mount.img
+  register: blkid_gluster_result
+  ignore_errors: yes
+
+- name: Check if loop is already mounted
+  command:
+    cmd: /bin/lsblk /dev/loop0
+  register: lsblk_loop0_result
+  ignore_errors: yes
+
+# Set up on the loop device if we don't have an FS and it isn't already mounted
+- name: Perform losetup
+  command:
+    cmd: losetup /dev/loop0 /gluster_mount.img
+  when: blkid_gluster_result is failed and lsblk_loop0_result is failed
+
+- name: Format filesystem
+  filesystem:
+    dev: /dev/loop0
+    fstype: xfs
+  when: blkid_gluster_result is failed and lsblk_loop0_result is not failed
+
+- name: Make gluster directory
+  file:
+    path: /data/brick1
+    owner: root
+    group: root
+    mode: '0700'
+    recurse: yes
+
+- name: mount gluster filesystem
+  mount:
+    path: /data/brick1
+    src: /gluster_mount.img
+    fstype: xfs
+    state: mounted
+
+- name: install gluster packages
+  package:
+    name: glusterfs-server
+    state: latest
+
+- name: start gluster services
+  service:
+    name: glusterd
+    state: started
+    enabled: yes
+
+- name: probe other servers
+  command: "/usr/sbin/gluster peer probe {{ item }}"
+  with_items:
+    "{{ groups['gluster_nodes'] }}"
+  when: gluster_role is defined and gluster_role == 'master'
+
+- name: Create gluster directory
+  file:
+    path: /data/brick1/gv0
+    owner: root
+    group: root
+    mode: '0700'
+    recurse: yes
+
+- name: Check if volume exists
+  shell:
+    cmd: '/usr/sbin/gluster volume info | /bin/grep gv0'
+  register: gv0_status
+  ignore_errors: true
+  when: gluster_role is defined and gluster_role == 'master'
+
+# Note: the below will create the volume, but will not automatically configure replication to a new server added to the cluster.
+
+- name: Transfer volume creation script
+  template:
+    dest: /tmp/create_volume.sh
+    src: tmp/create_volume.sh.j2
+    owner: root
+    group: root
+    mode: '0744'
+  when: gluster_role is defined and gluster_role == 'master'
+
+- name: Create the volume
+  command:
+    cmd: /tmp/create_volume.sh
+  when: gluster_role is defined and gluster_role == 'master' and gv0_status is failed
+
+- name: Mount the gluster volume
+  mount:
+    path: /mnt
+    src: "{{ ansible_hostname }}:/gv0"
+    fstype: glusterfs
+    state: mounted
+  tags:
+    - debug
+

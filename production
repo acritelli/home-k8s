@@ -1,0 +1,14 @@
+[gluster_nodes]
+raspi01
+raspi02
+raspi03
+
+[k8s_control_plane]
+raspi01
+
+[k8s_nodes]
+raspi02
+raspi03
+
+[backup_servers]
+raspi01

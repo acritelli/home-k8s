@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+gluster volume create gv0 replica {{ groups['gluster_nodes'] | length }} {% for host in groups['gluster_nodes'] %}{{ host }}:/data/brick1/gv0 {% endfor %}
+
+gluster volume start gv0

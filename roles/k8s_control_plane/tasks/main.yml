@@ -1,0 +1,16 @@
+- name: initialize control plane
+  command:
+    cmd: "kubeadm init --pod-network-cidr={{ pod_network_cidr }} --apiserver-advertise-address={{ eth0_ip.split('/')[0] }} "
+    creates: /etc/kubernetes/admin.conf
+
+- name: Transfer CNI config
+  copy:
+    dest: /tmp/calico.yaml
+    src: tmp/calico.yaml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install CNI
+  shell:
+    cmd: "KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f /tmp/calico.yaml"

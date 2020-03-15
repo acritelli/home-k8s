@@ -1,0 +1,35 @@
+- hosts: all
+  become: true
+  roles:
+    - common
+  tags: common
+
+- hosts: gluster_nodes
+  become: true
+  roles:
+    - gluster_node
+  tags: gluster
+
+- hosts: k8s_control_plane:k8s_nodes
+  become: true
+  roles:
+    - k8s_common
+  tags: k8s_common
+
+- hosts: k8s_control_plane
+  become: true
+  roles:
+    - k8s_control_plane
+  tags: k8s_control_plane
+
+- hosts: k8s_nodes
+  become: true
+  roles:
+    - k8s_node
+  tags: k8s_node
+
+- hosts: backup_servers
+  become: true
+  roles:
+    - backup_server
+  tags: backup

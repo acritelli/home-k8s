@@ -1,0 +1,4 @@
+ansible_user: ansible
+
+# For 18.04
+ansible_python_interpreter: /usr/bin/python3

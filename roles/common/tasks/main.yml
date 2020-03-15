@@ -1,0 +1,36 @@
+- name: install useful packages
+  package:
+    name:
+      - aptitude
+    state: latest
+
+- name: update all packages
+  package:
+    name: '*'
+    state: latest
+
+- name: set up backend interface
+  template:
+    dest: /etc/netplan/60-ethernet.yaml
+    src: etc/netplan/60-ethernet.yaml.j2
+    owner: root
+    group: root
+    mode: '0644'
+  notify: netplan apply
+
+- name: Add hosts file
+  template:
+    dest: /etc/hosts
+    src: etc/hosts.j2
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Add kernel boot parameters
+  copy:
+    dest: /boot/firmware/nobtcmd.txt
+    src: boot/firmware/nobtcmd.txt
+    owner: root
+    group: root
+    mode: '0755'
+  notify: restart and wait
