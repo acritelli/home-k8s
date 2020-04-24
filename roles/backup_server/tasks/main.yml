@@ -1,4 +1,4 @@
-- name: install rclobe
+- name: install rclone
   copy:
     dest: /usr/local/bin/rclone
     src: usr/local/bin/rclone
@@ -11,3 +11,19 @@
     group: root
     mode: '0640'
     state: directory
+
+- name: add rclone config
+  copy:
+    dest: /etc/rclone/rclone.conf
+    src: etc/rclone/rclone.conf
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: add backup job
+  copy:
+    dest: /etc/cron.d/backup-k8s
+    src: etc/cron.d/backup-k8s
+    owner: root
+    group: root
+    mode: '0644'

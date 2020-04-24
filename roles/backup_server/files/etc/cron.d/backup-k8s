@@ -1,0 +1,1 @@
+0 * * * *   root    /usr/local/bin/rclone --local-no-check-updated  --drive-use-trash=false --config /etc/rclone/rclone.conf sync --create-empty-src-dirs /mnt/ gdrive:/raspi-mnt

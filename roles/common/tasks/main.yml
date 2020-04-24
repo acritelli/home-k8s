@@ -2,6 +2,8 @@
   package:
     name:
       - aptitude
+      - prometheus-node-exporter
+      - sysstat
     state: latest
 
 - name: update all packages
@@ -34,3 +36,9 @@
     group: root
     mode: '0755'
   notify: restart and wait
+
+- name: ensure prometheus node exporter is running
+  service:
+    name: prometheus-node-exporter
+    state: started
+    enabled: yes

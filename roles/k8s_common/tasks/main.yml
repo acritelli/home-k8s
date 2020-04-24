@@ -48,7 +48,7 @@
       - kubelet
       - kubeadm
       - kubectl
-    state: latest
+    state: present
     update_cache: yes
 
 - name: hold Kubernetes package versions
