@@ -35,7 +35,6 @@
     owner: root
     group: root
     mode: '0700'
-    recurse: yes
 
 - name: mount gluster filesystem
   mount:
@@ -67,7 +66,6 @@
     owner: root
     group: root
     mode: '0700'
-    recurse: yes
 
 - name: Check if volume exists
   shell:
